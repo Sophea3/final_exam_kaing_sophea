@@ -1,55 +1,136 @@
 services:
 
   web:
+
     build: .
+
     container_name: web-server
+
     ports:
       - "2222:22"
+      - "8080:8080"
+
     tty: true
+
     command: >
       bash -c "
       set -e;
       cd /root;
       git clone https://github.com/Sophea3/final_exam_kaing_sophea.git /root/project 2>/dev/null || true;
       cd /root/project;
+
       chmod +x mvnw;
+
       sed -i 's|localhost:3006|mysql-db:3306|' src/main/resources/application.properties;
       sed -i 's|password=123|password=Hello@123|' src/main/resources/application.properties;
       sed -i 's|server.port=8082|server.port=8080|' src/main/resources/application.properties;
       sed -i 's|<java.version>25</java.version>|<java.version>21</java.version>|' pom.xml;
+
       echo 'Building Spring Boot...';
+
       ./mvnw clean package -DskipTests -q;
+
       echo 'Build complete.';
+
       /usr/sbin/sshd;
+
       echo 'Starting Spring Boot on port 8080...';
+
       java -jar target/demo-0.0.1-SNAPSHOT.jar --server.port=8080 &
+
       sleep 5;
-      echo 'Services ready: Spring Boot on :8080, SSH on :22';
+
+      echo 'Services ready: Spring Boot :8080 SSH :22';
+
       tail -f /dev/null
       "
+
+
     depends_on:
+
       - mysql
 
+
+
   nginx:
+
     image: nginx:latest
+
     container_name: nginx
+
     ports:
+
       - "8443:8082"
+
+
     volumes:
+
       - ./nginx/default.config:/etc/nginx/conf.d/default.conf
+
+
     depends_on:
+
       - web
 
+
+
+
   mysql:
+
     image: mysql:8
+
     container_name: mysql-db
+
+
     environment:
+
       MYSQL_ROOT_PASSWORD: Hello@123
+
       MYSQL_DATABASE: A_KAING_Sophea_db
+
+
     ports:
-      - "3306:3306"
+
+      - "3307:3306"
+
+
     healthcheck:
+
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+
       interval: 10s
+
       timeout: 5s
+
       retries: 5
+
+
+
+
+  phpmyadmin:
+
+    image: phpmyadmin/phpmyadmin
+
+    container_name: phpmyadmin
+
+
+    restart: always
+
+
+    depends_on:
+
+      - mysql
+
+
+    environment:
+
+      PMA_HOST: mysql-db
+
+      PMA_PORT: 3306
+
+      MYSQL_ROOT_PASSWORD: Hello@123
+
+
+    ports:
+
+      - "8090:80"
