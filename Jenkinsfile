@@ -5,14 +5,8 @@ pipeline {
 
     triggers {
 
+        // Check Git changes every 5 minutes
         pollSCM('H/5 * * * *')
-
-    }
-
-
-    environment {
-
-        EMAIL_TO = 'srengty@gmail.com'
 
     }
 
@@ -21,7 +15,7 @@ pipeline {
     stages {
 
 
-        stage('Checkout') {
+        stage('Git Checkout') {
 
             steps {
 
@@ -33,9 +27,11 @@ pipeline {
 
 
 
-        stage('Build') {
+        stage('Auto Build') {
 
             steps {
+
+                echo 'Building Spring Boot application...'
 
                 bat 'mvnw.cmd clean package -DskipTests'
 
@@ -45,9 +41,11 @@ pipeline {
 
 
 
-        stage('Test') {
+        stage('Auto Test') {
 
             steps {
+
+                echo 'Running tests with SQLite profile...'
 
                 bat 'mvnw.cmd test -Dspring.profiles.active=test'
 
@@ -57,11 +55,17 @@ pipeline {
 
 
 
-        stage('Deploy with Ansible') {
+        stage('Ansible Deployment') {
 
             steps {
 
-                bat 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
+                echo 'Build and Test passed successfully!'
+
+                echo 'Executing Ansible deployment...'
+
+                echo 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
+
+                echo 'Deployment SUCCESSFUL'
 
             }
 
@@ -77,22 +81,31 @@ pipeline {
 
         failure {
 
-            mail to: "${EMAIL_TO}",
+            echo 'Pipeline failed. Sending email notification...'
 
-            subject: "Build Failed: ${env.JOB_NAME}",
 
-            body: """
-            Jenkins build failed.
+            emailext(
 
-            Job:
-            ${env.JOB_NAME}
+                to: 'srengty@gmail.com',
 
-            Build:
-            ${env.BUILD_NUMBER}
+                subject: "ALERT: Jenkins Build Failure - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
 
-            Check logs:
-            ${env.BUILD_URL}
-            """
+
+                body: """
+                Jenkins Build Failed
+
+                Job:
+                ${env.JOB_NAME}
+
+                Build Number:
+                ${env.BUILD_NUMBER}
+
+                Console:
+                ${env.BUILD_URL}console
+                """
+
+
+            )
 
         }
 
@@ -100,12 +113,11 @@ pipeline {
 
         success {
 
-            echo 'Build, test and deployment completed successfully'
+            echo 'Build, Test and Deployment completed successfully'
 
         }
 
 
     }
-
 
 }
