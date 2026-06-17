@@ -1,0 +1,80 @@
+---
+- name: Build and Backup Spring Boot Application
+  hosts: web
+  become: false
+
+  vars:
+    app_dir: /root/project
+    backup_dir: /root/project/backups
+    db_name: A-KAING_Sophea-db
+    db_user: root
+    db_password: Hello@123
+
+  tasks:
+
+    - name: Ensure backup directory exists
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: '0755'
+
+
+    - name: Git pull latest code
+      shell: |
+        cd {{ app_dir }}
+        git reset --hard HEAD
+        git clean -fd
+        git pull
+      register: git_output
+
+
+    - name: Show git output
+      debug:
+        var: git_output.stdout
+
+
+    - name: Fix Maven wrapper permission
+      shell: |
+        cd {{ app_dir }}
+        chmod +x mvnw
+
+
+    - name: Build project using Maven
+      shell: |
+        cd {{ app_dir }}
+        ./mvnw clean package -DskipTests
+      register: build_output
+
+
+    - name: Show build output
+      debug:
+        var: build_output.stdout_lines
+
+
+    - name: Run SQLite tests
+      shell: |
+        cd {{ app_dir }}
+        chmod +x mvnw
+        ./mvnw test
+      register: test_output
+
+
+    - name: Show test output
+      debug:
+        var: test_output.stdout_lines
+
+
+    - name: Backup MySQL database
+      shell: |
+        mysqldump -h mysql-db -u{{ db_user }} -p'{{ db_password }}' {{ db_name }} > {{ backup_dir }}/backup_$(date +%F_%H-%M-%S).sql
+
+
+    - name: List backup files
+      shell: |
+        ls -lh {{ backup_dir }}
+      register: backup_output
+
+
+    - name: Show backup files
+      debug:
+        var: backup_output.stdout_lines
