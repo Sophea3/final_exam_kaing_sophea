@@ -3,73 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Dashboard</title>
+    <title>ID Card Management System</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
-            background: #f0f2f5;
-            padding: 40px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #eef2f7;
             padding: 30px;
         }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
         }
-        .header-actions {
+        .header {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px 12px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
         }
+        .header h1 { font-size: 24px; }
+        .header-actions { display: flex; gap: 10px; }
         .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #1877f2;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        .btn:hover { background: #166fe5; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #f8f9fa; color: #555; font-weight: 600; }
-        tr:hover { background: #f5f5f5; }
-        .empty { text-align: center; padding: 40px; color: #999; }
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
         }
+        .btn-primary { background: #1877f2; color: white; }
+        .btn-primary:hover { background: #166fe5; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn-warning { background: #ffc107; color: #333; }
+        .btn-warning:hover { background: #e0a800; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-info:hover { background: #138496; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.1); }
+
+        .content {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 25px;
+        }
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: #1a237e; }
+        .tab.active {
+            color: #1a237e;
+            border-bottom-color: #1a237e;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Create Form */
         .create-form {
             background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 25px;
             margin-bottom: 30px;
+            border: 1px solid #e9ecef;
         }
         .create-form h2 {
             font-size: 18px;
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .form-row {
             display: flex;
             gap: 15px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         .form-group {
             flex: 1;
+            min-width: 200px;
         }
         .form-group label {
             display: block;
@@ -79,93 +119,643 @@
             font-weight: 600;
         }
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            padding: 8px 10px;
+            padding: 9px 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 14px;
+            transition: border-color 0.2s;
         }
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: #1877f2;
+            box-shadow: 0 0 0 3px rgba(24,119,242,0.1);
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 14px;
+        }
+        th {
+            background: #f8f9fa;
+            color: #495057;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        tr:hover { background: #f8f9fa; }
+        .empty {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-student { background: #e3f2fd; color: #1565c0; }
+        .badge-employee { background: #e8f5e9; color: #2e7d32; }
+        .action-btns {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 600px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* ID Card Preview */
+        .id-card {
+            width: 340px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin: 0 auto;
+        }
+        .id-card-header {
+            background: linear-gradient(135deg, #1a237e, #3949ab);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .id-card-header h3 { font-size: 16px; margin-bottom: 4px; }
+        .id-card-header p { font-size: 12px; opacity: 0.8; }
+        .id-card-photo {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin: 15px auto 10px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .id-card-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .id-card-body {
+            padding: 20px;
+        }
+        .id-card-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+        .id-card-row .label { color: #888; }
+        .id-card-row .value { font-weight: 600; color: #333; }
+        .id-card-footer {
+            background: #f5f5f5;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* Batch Section */
+        .batch-upload {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .batch-upload:hover { border-color: #1877f2; }
+        .batch-upload p { color: #999; margin-top: 10px; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a237e;
+        }
+        .stat-card .label {
+            font-size: 13px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 2000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .form-row { flex-direction: column; }
+            .form-group { min-width: 100%; }
+            .header { flex-direction: column; gap: 15px; text-align: center; }
+            .action-btns { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header-actions">
-            <h1>Profile Dashboard</h1>
-            <a href="/api/profiles" class="btn">View API (JSON)</a>
+        <!-- Header -->
+        <div class="header">
+            <h1>🏛️ ID Card Management System</h1>
+            <div class="header-actions">
+                <a href="/api/profiles" class="btn btn-outline" target="_blank">API JSON</a>
+                <span class="btn btn-outline" onclick="location.reload()">🔄 Refresh</span>
+            </div>
         </div>
 
-        <!-- Create Profile Form -->
-        <div class="create-form">
-            <h2>Create New Profile</h2>
-            <form action="/create-profile" method="post">
+        <!-- Content -->
+        <div class="content">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="number" th:text="${profiles.size()}">0</div>
+                    <div class="label">Total Profiles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">-</div>
+                    <div class="label">Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">-</div>
+                    <div class="label">Employees</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">-</div>
+                    <div class="label">Templates</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('profiles')">📋 Profiles</div>
+                <div class="tab" onclick="switchTab('create')">➕ Create</div>
+                <div class="tab" onclick="switchTab('preview')">🖼️ Live Preview</div>
+                <div class="tab" onclick="switchTab('batch')">📦 Batch</div>
+            </div>
+
+            <!-- Tab: Profiles -->
+            <div id="tab-profiles" class="tab-content active">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Photo</th>
+                                <th>Full Name</th>
+                                <th>Type</th>
+                                <th>Department</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Reg. Number</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="profile, stat : ${profiles}">
+                                <td th:text="${profile.id}">1</td>
+                                <td>
+                                    <div style="width:35px;height:35px;border-radius:50%;background:#e0e0e0;overflow:hidden;">
+                                        <img th:if="${profile.photoFileName}" th:src="@{'/api/photos/' + ${profile.photoFileName}}" style="width:100%;height:100%;object-fit:cover;"
+                                             onerror="this.style.display='none'" alt="photo" />
+                                    </div>
+                                </td>
+                                <td style="font-weight:600;" th:text="${profile.fullName}">John Doe</td>
+                                <td>
+                                    <span class="badge" th:text="${profile.type}"
+                                          th:classappend="'badge-' + ${#strings.toLowerCase(profile.type)}">STUDENT</span>
+                                </td>
+                                <td th:text="${profile.department}">Engineering</td>
+                                <td th:text="${profile.email}">john@test.com</td>
+                                <td th:text="${profile.phone}">123-456</td>
+                                <td style="font-size:12px;font-family:monospace;" th:text="${profile.registrationNumber}">2026-ENG-001</td>
+                                <td>
+                                    <div class="action-btns">
+                                        <button class="btn btn-primary btn-sm" onclick="editProfile(this)"
+                                                data-id="${profile.id}"
+                                                data-name="${profile.fullName}"
+                                                data-email="${profile.email}"
+                                                data-phone="${profile.phone}"
+                                                data-dept="${profile.department}"
+                                                data-type="${profile.type}">✏️</button>
+                                        <button class="btn btn-info btn-sm" onclick="previewCard(
+                                            '${profile.fullName}',
+                                            '${profile.type}',
+                                            '${profile.department}',
+                                            '${profile.email}',
+                                            '${profile.phone}',
+                                            '${profile.registrationNumber}',
+                                            '${profile.photoFileName}'
+                                        )">🪪</button>
+                                        <a th:href="@{'/api/profiles/' + ${profile.id} + '/pdf'}" class="btn btn-warning btn-sm" target="_blank">📄</a>
+                                        <a th:href="@{'/api/profiles/' + ${profile.id} + '/qrcode'}" class="btn btn-success btn-sm" target="_blank">🔲</a>
+                                        <a th:href="@{'/api/profiles/' + ${profile.id} + '/barcode'}" class="btn btn-sm" style="background:#6f42c1;color:white;" target="_blank">📊</a>
+                                        <form th:action="@{'/delete-profile/' + ${profile.id}}" method="post" style="display:inline;" onsubmit="return confirm('Delete this profile?')">
+                                            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(profiles)}">
+                                <td colspan="9" class="empty">
+                                    <div style="font-size:48px;margin-bottom:15px;">📋</div>
+                                    <p>No profiles yet. Create your first profile!</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Create -->
+            <div id="tab-create" class="tab-content">
+                <div class="create-form">
+                    <h2>📝 Create New Profile</h2>
+                    <form action="/create-profile" method="post" enctype="multipart/form-data">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName">Full Name *</label>
+                                <input type="text" id="fullName" name="fullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="text" id="phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="department">Department</label>
+                                <input type="text" id="department" name="department">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="type">Type *</label>
+                                <select id="type" name="type" required>
+                                    <option th:each="pt : ${profileTypes}" th:value="${pt}" th:text="${pt}">STUDENT</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="photoFile">Photo</label>
+                                <input type="file" id="photoFile" name="photoFile" accept="image/jpeg,image/png">
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success">Create Profile</button>
+                            <button type="reset" class="btn" style="background:#6c757d;color:white;">Clear</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab: Live Preview -->
+            <div id="tab-preview" class="tab-content">
+                <div style="display:flex;gap:30px;flex-wrap:wrap;justify-content:center;">
+                    <div style="flex:1;min-width:300px;">
+                        <h2 style="margin-bottom:15px;color:#333;">🖼️ ID Card Preview</h2>
+                        <div class="id-card" id="previewCard">
+                            <div class="id-card-header">
+                                <h3 id="previewInstitution">Demo University</h3>
+                                <p>ID CARD</p>
+                                <div class="id-card-photo" id="previewPhoto">
+                                    <span style="color:#999;font-size:12px;">📷</span>
+                                </div>
+                            </div>
+                            <div class="id-card-body">
+                                <div class="id-card-row">
+                                    <span class="label">Name</span>
+                                    <span class="value" id="previewName">—</span>
+                                </div>
+                                <div class="id-card-row">
+                                    <span class="label">Type</span>
+                                    <span class="value" id="previewType">—</span>
+                                </div>
+                                <div class="id-card-row">
+                                    <span class="label">Department</span>
+                                    <span class="value" id="previewDept">—</span>
+                                </div>
+                                <div class="id-card-row">
+                                    <span class="label">Email</span>
+                                    <span class="value" id="previewEmail">—</span>
+                                </div>
+                                <div class="id-card-row">
+                                    <span class="label">Phone</span>
+                                    <span class="value" id="previewPhone">—</span>
+                                </div>
+                                <div class="id-card-row">
+                                    <span class="label">ID</span>
+                                    <span class="value" id="previewReg">—</span>
+                                </div>
+                            </div>
+                            <div class="id-card-footer">
+                                <span id="previewQR">[ QR Code Placeholder ]</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex:1;min-width:300px;">
+                        <h2 style="margin-bottom:15px;color:#333;">🔧 Preview Settings</h2>
+                        <div style="background:#f8f9fa;padding:20px;border-radius:10px;">
+                            <p style="color:#666;margin-bottom:15px;">Select a profile from the table and click 🪪 to preview, or fill in below:</p>
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="pvName" oninput="updatePreview()" placeholder="Enter name">
+                            </div>
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select id="pvType" onchange="updatePreview()">
+                                    <option value="STUDENT">STUDENT</option>
+                                    <option value="EMPLOYEE">EMPLOYEE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <input type="text" id="pvDept" oninput="updatePreview()" placeholder="Enter department">
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="text" id="pvEmail" oninput="updatePreview()" placeholder="Enter email">
+                            </div>
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="text" id="pvPhone" oninput="updatePreview()" placeholder="Enter phone">
+                            </div>
+                            <div class="form-group">
+                                <label>Registration #</label>
+                                <input type="text" id="pvReg" oninput="updatePreview()" placeholder="e.g. 2026-ENG-001">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Batch -->
+            <div id="tab-batch" class="tab-content">
+                <h2 style="margin-bottom:20px;color:#333;">📦 Batch ID Card Generation</h2>
+                <div style="display:flex;gap:20px;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:300px;">
+                        <div class="create-form">
+                            <h3>Create Multiple Profiles at Once</h3>
+                            <form action="/create-profile" method="post">
+                                <p style="color:#666;margin-bottom:15px;font-size:13px;">Enter one profile per line with format: <code>Name, Email, Phone, Department, Type</code></p>
+                                <div class="form-group">
+                                    <label>Profiles Data</label>
+                                    <textarea id="batchData" rows="6" style="font-family:monospace;font-size:13px;" placeholder="John Doe, john@test.com, 123-456, Engineering, STUDENT&#10;Jane Smith, jane@test.com, 789-012, Marketing, EMPLOYEE"></textarea>
+                                </div>
+                                <button type="button" class="btn btn-success" onclick="processBatch()">Generate Batch</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div style="flex:1;min-width:300px;">
+                        <div class="create-form">
+                            <h3>Upload CSV File</h3>
+                            <div class="batch-upload" onclick="document.getElementById('csvFile').click()">
+                                <div style="font-size:48px;">📄</div>
+                                <p>Click to upload CSV file</p>
+                                <p style="font-size:12px;color:#bbb;">Format: Name, Email, Phone, Department, Type</p>
+                                <input type="file" id="csvFile" accept=".csv" style="display:none;" onchange="handleCSV(this)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <h2>✏️ Edit Profile</h2>
+            <form th:action="@{'/update-profile/'}" method="post" id="editForm">
+                <input type="hidden" id="editId" name="id">
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="fullName">Full Name</label>
-                        <input type="text" id="fullName" name="fullName" required>
+                        <label for="editName">Full Name *</label>
+                        <input type="text" id="editName" name="fullName" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
+                        <label for="editEmail">Email *</label>
+                        <input type="email" id="editEmail" name="email" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input type="text" id="phone" name="phone">
+                        <label for="editPhone">Phone</label>
+                        <input type="text" id="editPhone" name="phone">
                     </div>
                     <div class="form-group">
-                        <label for="department">Department</label>
-                        <input type="text" id="department" name="department">
+                        <label for="editDept">Department</label>
+                        <input type="text" id="editDept" name="department">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="type">Type</label>
-                        <select id="type" name="type" required>
-                            <option th:each="pt : ${profileTypes}"
-                                    th:value="${pt}" th:text="${pt}">STUDENT</option>
+                        <label for="editType">Type *</label>
+                        <select id="editType" name="type" required>
+                            <option th:each="pt : ${profileTypes}" th:value="${pt}" th:text="${pt}">STUDENT</option>
                         </select>
                     </div>
-                    <div class="form-group" style="display:flex; align-items:flex-end;">
-                        <button type="submit" class="btn">Create Profile</button>
-                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn" style="background:#6c757d;color:white;" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Full Name</th>
-                    <th>Type</th>
-                    <th>Department</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Registration #</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="profile : ${profiles}">
-                    <td th:text="${profile.id}">1</td>
-                    <td th:text="${profile.fullName}">John Doe</td>
-                    <td th:text="${profile.type}">STUDENT</td>
-                    <td th:text="${profile.department}">Engineering</td>
-                    <td th:text="${profile.email}">john@example.com</td>
-                    <td th:text="${profile.phone}">123-456-7890</td>
-                    <td th:text="${profile.registrationNumber}">2026-ENG-001</td>
-                </tr>
-                <tr th:if="${#lists.isEmpty(profiles)}">
-                    <td colspan="7" class="empty">No profiles found. Create one via the API.</td>
-                </tr>
-            </tbody>
-        </table>
     </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== TAB SWITCHING =====
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.add('active');
+            document.querySelector(`.tab[onclick*="${tabName}"]`).classList.add('active');
+        }
+
+        // ===== LIVE PREVIEW =====
+        function updatePreview() {
+            document.getElementById('previewName').textContent = document.getElementById('pvName').value || '—';
+            document.getElementById('previewType').textContent = document.getElementById('pvType').value;
+            document.getElementById('previewDept').textContent = document.getElementById('pvDept').value || '—';
+            document.getElementById('previewEmail').textContent = document.getElementById('pvEmail').value || '—';
+            document.getElementById('previewPhone').textContent = document.getElementById('pvPhone').value || '—';
+            document.getElementById('previewReg').textContent = document.getElementById('pvReg').value || '—';
+        }
+
+        function previewCard(name, type, dept, email, phone, reg, photo) {
+            document.getElementById('pvName').value = name;
+            document.getElementById('pvType').value = type;
+            document.getElementById('pvDept').value = dept || '';
+            document.getElementById('pvEmail').value = email || '';
+            document.getElementById('pvPhone').value = phone || '';
+            document.getElementById('pvReg').value = reg || '';
+            updatePreview();
+            if (photo) {
+                document.getElementById('previewPhoto').innerHTML = '<img src="/api/photos/' + photo + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=\'<span style=color:#999;font-size:12px;>📷</span>\'" />';
+            } else {
+                document.getElementById('previewPhoto').innerHTML = '<span style="color:#999;font-size:12px;">📷</span>';
+            }
+            switchTab('preview');
+        }
+
+        // ===== EDIT MODAL =====
+        function editProfile(btn) {
+            const row = btn.closest('tr');
+            document.getElementById('editId').value = btn.getAttribute('data-id');
+            document.getElementById('editName').value = btn.getAttribute('data-name');
+            document.getElementById('editEmail').value = btn.getAttribute('data-email');
+            document.getElementById('editPhone').value = btn.getAttribute('data-phone');
+            document.getElementById('editDept').value = btn.getAttribute('data-dept');
+            document.getElementById('editType').value = btn.getAttribute('data-type');
+            document.getElementById('editForm').action = '/update-profile/' + btn.getAttribute('data-id');
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEditModal();
+        });
+
+        // ===== BATCH PROCESSING =====
+        function processBatch() {
+            const data = document.getElementById('batchData').value.trim();
+            if (!data) { alert('Please enter profile data'); return; }
+            const lines = data.split('\n').filter(l => l.trim());
+            let success = 0, fail = 0;
+            lines.forEach(line => {
+                const parts = line.split(',').map(s => s.trim());
+                if (parts.length >= 2) {
+                    fetch('/api/profiles', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            fullName: parts[0],
+                            email: parts[1] || '',
+                            phone: parts[2] || '',
+                            department: parts[3] || '',
+                            type: parts[4] || 'STUDENT'
+                        })
+                    }).then(r => {
+                        if (r.ok) success++; else fail++;
+                        if (success + fail === lines.length) {
+                            showToast(`Batch complete: ${success} created, ${fail} failed`);
+                            if (success > 0) setTimeout(() => location.reload(), 1000);
+                        }
+                    }).catch(() => {
+                        fail++;
+                        if (success + fail === lines.length) showToast(`Batch complete: ${success} created, ${fail} failed`);
+                    });
+                } else { fail++; }
+            });
+            showToast(`Processing ${lines.length} profiles...`);
+        }
+
+        function handleCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n').filter(l => l.trim());
+                // Skip header if exists
+                const dataLines = lines[0] && lines[0].toLowerCase().includes('name') ? lines.slice(1) : lines;
+                document.getElementById('batchData').value = dataLines.join('\n');
+                showToast(`Loaded ${dataLines.length} profiles from CSV`);
+            };
+            reader.readAsText(file);
+        }
+
+        // ===== TOAST =====
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+    </script>
 </body>
 </html>
