@@ -1,0 +1,10 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
++--------------------+
+| Database           |
++--------------------+
+| A_KAING_Sophea_db  |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
