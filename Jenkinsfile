@@ -10,10 +10,18 @@ pipeline {
     }
 
 
+    environment {
+
+        EMAIL_TO = 'srengty@gmail.com'
+
+    }
+
+
+
     stages {
 
 
-        stage('Git Checkout') {
+        stage('Checkout') {
 
             steps {
 
@@ -25,13 +33,11 @@ pipeline {
 
 
 
-        stage('Build and Test') {
+        stage('Build') {
 
             steps {
 
-                echo "Building Spring Boot project..."
-
-                bat 'mvnw.cmd clean package'
+                bat 'mvnw.cmd clean package -DskipTests'
 
             }
 
@@ -39,11 +45,21 @@ pipeline {
 
 
 
-        stage('Deploy Using Ansible') {
+        stage('Test') {
 
             steps {
 
-                echo "Deploying using Ansible..."
+                bat 'mvnw.cmd test -Dspring.profiles.active=test'
+
+            }
+
+        }
+
+
+
+        stage('Deploy with Ansible') {
+
+            steps {
 
                 bat 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
 
@@ -61,31 +77,30 @@ pipeline {
 
         failure {
 
-            emailext(
+            mail to: "${EMAIL_TO}",
 
-                to: 'srengty@gmail.com',
+            subject: "Build Failed: ${env.JOB_NAME}",
 
-                subject: "Jenkins Build Failed ${env.JOB_NAME}",
+            body: """
+            Jenkins build failed.
 
-                body: """
-                Build failed.
+            Job:
+            ${env.JOB_NAME}
 
-                Job:
-                ${env.JOB_NAME}
+            Build:
+            ${env.BUILD_NUMBER}
 
-                Build:
-                ${env.BUILD_NUMBER}
+            Check logs:
+            ${env.BUILD_URL}
+            """
 
-                Console:
-                ${env.BUILD_URL}console
-                """,
+        }
 
-                recipientProviders: [
-                    [$class: 'CulpritsRecipientProvider'],
-                    [$class: 'DevelopersRecipientProvider']
-                ]
 
-            )
+
+        success {
+
+            echo 'Build, test and deployment completed successfully'
 
         }
 
